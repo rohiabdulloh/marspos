@@ -2,73 +2,50 @@ import { useState } from "react";
 import { Head, router } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { DataTable } from '@/components/data-table';
 import { ConfirmDialog } from '@/components/confirm-dialog';
-import { Plus, Pencil, Trash, ChevronRight, ChevronDown, CheckCircle, XCircle } from "lucide-react";
+import { Plus, Pencil, Trash } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ColumnDef } from '@tanstack/react-table';
 
-import ModalForm from '@/pages/accounts/form';
+import SupplierForm from '@/pages/suppliers/form';
 import r from '@/lib/route';
 
-export default function Index({ accounts, parents }: any) {
+export default function Index({ suppliers }: any) {
     const [open, setOpen] = useState(false);
     const [selected, setSelected] = useState<any>(null);
 
-    //Mendefinisikan kolom
     const columns: ColumnDef<any>[] = [
         {
-            accessorKey: 'code',
-            header: 'Code',
-            cell: ({ row }) => {
-                const canExpand = row.getCanExpand();
-
-                return (
-                    <div
-                        className="flex items-center gap-2"
-                        style={{ paddingLeft: row.depth * 20 }}
-                    >
-                        {canExpand && (
-                            <button
-                                onClick={row.getToggleExpandedHandler()}
-                            >
-                                {row.getIsExpanded() ? (
-                                    <ChevronDown size={16} />
-                                ) : (
-                                    <ChevronRight size={16} />
-                                )}
-                            </button>
-                        )}
-                        {row.original.code}
-                    </div>
-                );
-            },
+            accessorKey: 'name',
+            header: 'Name',
         },
-        { accessorKey: 'name', header: 'Name', },
-        { accessorKey: 'type', header: 'Type', },
         {
-            accessorKey: 'is_active',
-            header: 'Status',
-            cell: ({ row }) =>
-                row.original.is_active ? (
-                    <Badge className="bg-green-100 text-green-700 flex gap-1 items-center">
-                        <CheckCircle className="w-3 h-3" />
-                        Active
-                    </Badge>
-                ) : (
-                    <Badge className="bg-red-100 text-red-700 flex gap-1 items-center">
-                        <XCircle className="w-3 h-3" />
-                        Inactive
-                    </Badge>
-                ),
+            accessorKey: 'email',
+            header: 'Email',
+            cell: ({ row }) => row.original.email || '-',
+        },
+        {
+            accessorKey: 'phone',
+            header: 'Phone',
+            cell: ({ row }) => row.original.phone || '-',
+        },
+        {
+            accessorKey: 'address',
+            header: 'Address',
+            cell: ({ row }) => (
+                <span className="truncate max-w-xs block">
+                    {row.original.address || '-'}
+                </span>
+            ),
         },
         {
             id: 'actions',
             header: 'Action',
             cell: ({ row }) => (
                 <div className="flex justify-end gap-2">
-                    <Button size="icon"
+                    <Button
+                        size="icon"
                         onClick={() => {
                             setSelected(row.original);
                             setOpen(true);
@@ -83,10 +60,10 @@ export default function Index({ accounts, parents }: any) {
                                 <Trash size={16} />
                             </Button>
                         }
-                        title="Hapus Account?"
+                        title="Hapus Supplier?"
                         description={
                             <>
-                                Yakin ingin menghapus akun{' '}
+                                Yakin ingin menghapus supplier{' '}
                                 <b>{row.original.name}</b>?<br />
                                 Data tidak dapat dikembalikan.
                             </>
@@ -94,7 +71,7 @@ export default function Index({ accounts, parents }: any) {
                         confirmText="Hapus"
                         onConfirm={() =>
                             router.delete(
-                                r('accounts.destroy', row.original.id)
+                                r('suppliers.destroy', row.original.id)
                             )
                         }
                     />
@@ -106,36 +83,33 @@ export default function Index({ accounts, parents }: any) {
 
     return (
         <div className="p-6 space-y-4">
-            <Head title="Chart of Accounts" />
+            <Head title="Suppliers" />
 
-            {/* Header */}
+            {/* HEADER */}
             <div className="flex justify-between items-center">
                 <h1 className="text-xl font-bold">
-                    Chart of Accounts
+                    Suppliers
                 </h1>
 
                 <Button onClick={() => {
-                        setSelected(null); 
-                        setOpen(true);
-                    }}
-                >
+                    setSelected(null);
+                    setOpen(true);
+                }}>
                     <Plus className="mr-2" size={16} />
-                    Add Account
+                    Add Supplier
                 </Button>
             </div>
 
-            {/* TABLE*/}
+            {/* TABLE */}
             <Card>
                 <CardContent className="px-4">
                     <p className="text-sm text-muted-foreground mb-4">
-                        Daftar akun akuntansi untuk mencatat transaksi keuangan perusahaan seperti aset, kewajiban, ekuitas, pendapatan, dan beban.
+                        Daftar supplier yang menyediakan barang atau jasa untuk perusahaan.
                     </p>
 
                     <DataTable
                         columns={columns}
-                        data={accounts}
-                        isTree
-                        getSubRows={(row) => row.children ?? []}
+                        data={suppliers}
                         enableSearch
                         enableSorting
                         enablePagination
@@ -144,7 +118,7 @@ export default function Index({ accounts, parents }: any) {
                 </CardContent>
             </Card>
 
-            {/* MODAL FORM */}
+            {/* MODAL */}
             <Dialog
                 open={open}
                 onOpenChange={(val) => {
@@ -155,14 +129,13 @@ export default function Index({ accounts, parents }: any) {
                 <DialogContent className="w-[90vw] md:w-[50vw] max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>
-                            {selected ? 'Edit Account' : 'Create Account'}
+                            {selected ? 'Edit Supplier' : 'Create Supplier'}
                         </DialogTitle>
                     </DialogHeader>
 
-                    <ModalForm
+                    <SupplierForm
                         key={selected?.id ?? 'create'}
-                        account={selected}
-                        parents={parents}
+                        supplier={selected}
                         onSuccess={() => setOpen(false)}
                         onCancel={() => setOpen(false)}
                     />
@@ -179,8 +152,8 @@ Index.layout = {
             href: r('dashboard'),
         },
         {
-            title: 'Chart of Accounts',
-            href: r('accounts.index'),
+            title: 'Suppliers',
+            href: r('suppliers.index'),
         },
     ],
 };

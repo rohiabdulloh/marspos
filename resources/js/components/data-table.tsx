@@ -39,20 +39,24 @@ type DataTableProps<TData, TValue> = {
     columns: ColumnDef<TData, TValue>[];
     data: TData[];
 
-    // Tree support (optional)
+    // Tree
     isTree?: boolean;
     getSubRows?: (row: TData) => TData[] | undefined;
 
-    // Feature toggles
+    // Features
     enableSearch?: boolean;
     enableSorting?: boolean;
     enablePagination?: boolean;
 
-    // Pagination config
+    // Bulk (optional)
+    enableRowSelection?: boolean;
+    bulkActions?: (rows: TData[]) => React.ReactNode;
+    getRowId?: (row: TData) => string;
+
+    // Pagination
     pageSizeOptions?: number[];
     initialPageSize?: number;
 
-    // Optional: custom empty text
     emptyText?: string;
 };
 
@@ -64,10 +68,16 @@ export function DataTable<TData, TValue>({
     enableSearch = true,
     enableSorting = true,
     enablePagination = true,
+
+    enableRowSelection = false,
+    bulkActions,
+    getRowId,
+
     pageSizeOptions = [10, 20, 50, 100],
     initialPageSize,
     emptyText = 'No data found.',
 }: DataTableProps<TData, TValue>) {
+
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [globalFilter, setGlobalFilter] = React.useState<string>('');
     const [expanded, setExpanded] = React.useState<ExpandedState>({});
@@ -76,89 +86,126 @@ export function DataTable<TData, TValue>({
         pageSize: initialPageSize ?? pageSizeOptions[0],
     });
     const [columnVisibility, setColumnVisibility] = React.useState({});
+    const [rowSelection, setRowSelection] = React.useState({});
+
+    // 🔥 Selection column
+    const selectionColumn: ColumnDef<TData> = {
+        id: '__select',
+        header: ({ table }) => (
+            <input
+                type="checkbox"
+                checked={table.getIsAllPageRowsSelected()}
+                onChange={table.getToggleAllPageRowsSelectedHandler()}
+            />
+        ),
+        cell: ({ row }) => (
+            <input
+                type="checkbox"
+                checked={row.getIsSelected()}
+                onChange={row.getToggleSelectedHandler()}
+            />
+        ),
+        size: 40,
+    };
+
+    // 🔥 Final columns
+    const finalColumns = React.useMemo(() => {
+        if (!enableRowSelection) return columns;
+        return [selectionColumn, ...columns];
+    }, [columns, enableRowSelection]);
 
     const table = useReactTable({
         data,
-        columns,
+        columns: finalColumns,
         state: {
             sorting,
             globalFilter,
             expanded,
             pagination,
             columnVisibility,
+            rowSelection,
         },
+
+        onRowSelectionChange: setRowSelection,
         onColumnVisibilityChange: setColumnVisibility,
         onSortingChange: enableSorting ? setSorting : undefined,
         onGlobalFilterChange: (value) => {
             setGlobalFilter(value);
-            // Auto-expand semua node saat search di mode tree
             if (isTree && value) setExpanded(true);
         },
         onExpandedChange: setExpanded,
         onPaginationChange: setPagination,
 
-        // Core + features
+        enableRowSelection,
+        getRowId,
+
         getSubRows,
         getCoreRowModel: getCoreRowModel(),
         getFilteredRowModel: enableSearch ? getFilteredRowModel() : undefined,
         getSortedRowModel: enableSorting ? getSortedRowModel() : undefined,
         getExpandedRowModel: isTree ? getExpandedRowModel() : undefined,
-        getPaginationRowModel: enablePagination
-            ? getPaginationRowModel()
-            : undefined,
+        getPaginationRowModel: enablePagination ? getPaginationRowModel() : undefined,
     });
+
+    const selectedRows = table.getSelectedRowModel().rows.map(r => r.original);
 
     return (
         <div className="space-y-4">
+
+            {/* 🔥 BULK ACTION */}
+            {enableRowSelection && bulkActions && selectedRows.length > 0 && (
+                <div className="flex items-center justify-between p-3 border rounded bg-muted">
+                    <span className="text-sm">
+                        {selectedRows.length} selected
+                    </span>
+
+                    <div className="flex gap-2">
+                        {bulkActions(selectedRows)}
+                    </div>
+                </div>
+            )}
+
+            {/* TOP BAR */}
             <div className="flex items-center justify-between gap-2">
-                {/* SEARCH */}
                 {enableSearch && (
                     <div className="relative max-w-sm">
                         <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                
                         <Input
                             placeholder="Search..."
                             value={globalFilter ?? ''}
-                            onChange={(e) =>
-                                table.setGlobalFilter(e.target.value)
-                            }
+                            onChange={(e) => table.setGlobalFilter(e.target.value)}
                             className="pl-9"
                         />
                     </div>
                 )}
 
-                {/* COLUMN VISIBILITY */}
                 <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm" className="gap-1">
-                        Columns
-                        <ChevronDown className="h-4 w-4" />
-                    </Button>
-                </DropdownMenuTrigger>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="outline" size="sm" className="gap-1">
+                            Columns
+                            <ChevronDown className="h-4 w-4" />
+                        </Button>
+                    </DropdownMenuTrigger>
 
                     <DropdownMenuContent align="end">
-                        {table
-                            .getAllLeafColumns()
+                        {table.getAllLeafColumns()
                             .filter((col) => col.getCanHide())
-                            .map((column) => {
-                                return (
-                                    <DropdownMenuCheckboxItem
-                                        key={column.id}
-                                        className="capitalize"
-                                        checked={column.getIsVisible()}
-                                        onCheckedChange={(value) =>
-                                            column.toggleVisibility(!!value)
-                                        }
-                                    >
-                                        {column.id}
-                                    </DropdownMenuCheckboxItem>
-                                );
-                            })}
+                            .map((column) => (
+                                <DropdownMenuCheckboxItem
+                                    key={column.id}
+                                    checked={column.getIsVisible()}
+                                    onCheckedChange={(v) =>
+                                        column.toggleVisibility(!!v)
+                                    }
+                                >
+                                    {column.id}
+                                </DropdownMenuCheckboxItem>
+                            ))}
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
 
-            {/* 📊TABLE */}
+            {/* TABLE */}
             <div className="border rounded-md">
                 <Table>
                     <TableHeader>
@@ -177,18 +224,13 @@ export function DataTable<TData, TValue>({
                                                 ? 'cursor-pointer select-none'
                                                 : ''
                                         }
-                                        style={{
-                                            width: header.column.getSize(),
-                                            maxWidth: header.column.getSize(),
-                                        }}
                                     >
                                         <div className="flex items-center gap-2">
                                             {flexRender(
                                                 header.column.columnDef.header,
                                                 header.getContext()
                                             )}
-                                    
-                                            {/* 🔽 SORT ICON */}
+
                                             {enableSorting && header.column.getCanSort() && (
                                                 <>
                                                     {header.column.getIsSorted() === 'asc' ? (
@@ -223,7 +265,7 @@ export function DataTable<TData, TValue>({
                             ))
                         ) : (
                             <TableRow>
-                                <TableCell colSpan={columns.length}>
+                                <TableCell colSpan={finalColumns.length}>
                                     {emptyText}
                                 </TableCell>
                             </TableRow>
@@ -232,20 +274,15 @@ export function DataTable<TData, TValue>({
                 </Table>
             </div>
 
-            {/* 📄 FOOTER */}
+            {/* FOOTER */}
             {enablePagination && (
                 <div className="flex items-center justify-between">
-                    {/* Rows per page */}
                     <div className="flex items-center gap-2 text-sm">
                         <span>Rows per page:</span>
                         <select
-                            value={
-                                table.getState().pagination.pageSize
-                            }
+                            value={table.getState().pagination.pageSize}
                             onChange={(e) =>
-                                table.setPageSize(
-                                    Number(e.target.value)
-                                )
+                                table.setPageSize(Number(e.target.value))
                             }
                             className="border rounded px-2 py-1"
                         >
@@ -257,49 +294,17 @@ export function DataTable<TData, TValue>({
                         </select>
                     </div>
 
-                    {/* Pagination */}
                     <div className="flex items-center gap-4">
                         <span className="text-sm">
-                            Page{' '}
-                            {table.getState().pagination.pageIndex + 1}{' '}
-                            of {table.getPageCount()}
+                            Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
                         </span>
 
                         <div className="flex gap-2">
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => table.firstPage()}
-                                disabled={!table.getCanPreviousPage()}
-                            >
-                                {'<<'}
-                            </Button>
-
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => table.previousPage()}
-                                disabled={!table.getCanPreviousPage()}
-                            >
+                            <Button size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
                                 Prev
                             </Button>
-
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => table.nextPage()}
-                                disabled={!table.getCanNextPage()}
-                            >
+                            <Button size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
                                 Next
-                            </Button>
-
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => table.lastPage()}
-                                disabled={!table.getCanNextPage()}
-                            >
-                                {'>>'}
                             </Button>
                         </div>
                     </div>

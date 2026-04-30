@@ -10,12 +10,25 @@ class Transaction extends Model
         'type',
         'date',
         'reference',
-        'amount',
-        'journal_id'
+        'customer_id',
+        'supplier_id',
+        'description',
+        'total_debit',
+        'total_credit',
     ];
 
-    public function journal()
+    public function items()
     {
-        return $this->belongsTo(Journal::class);
+        return $this->hasMany(TransactionItem::class);
+    }
+
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class);
+    }
+
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class);
     }
 }

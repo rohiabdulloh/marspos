@@ -1,32 +1,28 @@
 <?php
+
 namespace App\Http\Controllers\Pages;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-
 use App\Models\Account;
 
 class AccountController extends Controller
 {
     public function index()
     {
+        // tree untuk table
         $accounts = Account::with('children')
             ->whereNull('parent_id')
             ->orderBy('code')
             ->get();
 
-        return Inertia::render('accounts/index', [
-            'accounts' => $accounts
-        ]);
-    }
-
-    public function create()
-    {
+        // flat untuk select parent
         $parents = Account::orderBy('code')->get();
 
-        return Inertia::render('accounts/create', [
-            'parents' => $parents
+        return Inertia::render('accounts/index', [
+            'accounts' => $accounts,
+            'parents' => $parents, 
         ]);
     }
 
@@ -40,20 +36,9 @@ class AccountController extends Controller
 
         Account::create($request->all());
 
-        return redirect()->route('accounts.index')
+        return redirect()
+            ->route('accounts.index')
             ->with('success', 'Account created');
-    }
-
-    public function edit(Account $account)
-    {
-        $parents = Account::where('id', '!=', $account->id)
-            ->orderBy('code')
-            ->get();
-
-        return Inertia::render('accounts/edit', [
-            'account' => $account,
-            'parents' => $parents
-        ]);
     }
 
     public function update(Request $request, Account $account)
@@ -66,7 +51,8 @@ class AccountController extends Controller
 
         $account->update($request->all());
 
-        return redirect()->route('accounts.index')
+        return redirect()
+            ->route('accounts.index')
             ->with('success', 'Account updated');
     }
 

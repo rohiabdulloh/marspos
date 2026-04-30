@@ -47,12 +47,12 @@ const mainNavItems: NavItem[] = [
             },
             {
                 title: 'Customers',
-                href: r('accounts.index'),
+                href: r('customers.index'),
                 icon: Users,
             },
             {
                 title: 'Suppliers',
-                href: r('accounts.index'),
+                href: r('suppliers.index'),
                 icon: Building2,
             },
         ],
@@ -65,7 +65,7 @@ const mainNavItems: NavItem[] = [
         items: [
             {
                 title: 'Transactions',
-                href: r('accounts.index'),
+                href: r('transactions.index'),
                 icon: ArrowLeftRight,
             },
             {

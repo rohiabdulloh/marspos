@@ -21,5 +21,21 @@ class Customer extends Model
     public function payments()
     {
         return $this->hasMany(Payment::class);
+    }    
+
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
+    }
+    
+    public function getTotalTransactionAttribute()
+    {
+        return $this->transactions()->sum('total_debit');
+    }
+
+    public function salesTransactions()
+    {
+        return $this->hasMany(Transaction::class)
+            ->where('type', 'sales');
     }
 }

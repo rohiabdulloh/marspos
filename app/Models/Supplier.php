@@ -22,4 +22,23 @@ class Supplier extends Model
     {
         return $this->hasMany(Payment::class);
     }
+
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
+    }
+
+    public function purchaseTransactions()
+    {
+        return $this->hasMany(Transaction::class)
+            ->where('type', 'purchase');
+    }
+
+    public function getTotalPayableAttribute()
+    {
+        return $this->transactions()
+            ->where('type', 'purchase')
+            ->sum('total_credit');
+    }
+
 }
