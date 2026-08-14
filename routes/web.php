@@ -7,7 +7,11 @@ use Laravel\Fortify\Features;
 use App\Http\Controllers\Pages\AccountController;
 use App\Http\Controllers\Pages\CustomerController;
 use App\Http\Controllers\Pages\SupplierController;
+
 use App\Http\Controllers\Pages\TransactionController;
+use App\Http\Controllers\Pages\InvoiceController;
+use App\Http\Controllers\Pages\BillController;
+use App\Http\Controllers\Pages\PaymentController;
 
 
 Route::inertia('/', 'welcome', [
@@ -22,6 +26,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('suppliers', SupplierController::class);
     
     Route::resource('transactions', TransactionController::class);
+    Route::resource('invoices', InvoiceController::class);
+    Route::resource('bills', BillController::class);
+    Route::resource('payments', PaymentController::class);
 });
 
 require __DIR__.'/settings.php';

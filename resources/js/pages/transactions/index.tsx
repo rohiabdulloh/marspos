@@ -115,3 +115,17 @@ export default function Index({ transactions, accounts, customers, suppliers }: 
         </div>
     );
 }
+
+
+Index.layout = {
+    breadcrumbs: [
+        {
+            title: 'Dashboard',
+            href: r('dashboard'),
+        },
+        {
+            title: 'Transactions',
+            href: r('transactions.index'),
+        },
+    ],
+};

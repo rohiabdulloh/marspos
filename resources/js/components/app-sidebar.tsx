@@ -70,17 +70,17 @@ const mainNavItems: NavItem[] = [
             },
             {
                 title: 'Invoices',
-                href: r('accounts.index'),
+                href: r('invoices.index'),
                 icon: FileText,
             },
             {
                 title: 'Bills',
-                href: r('accounts.index'),
+                href: r('bills.index'),
                 icon: Receipt,
             },
             {
                 title: 'Payments',
-                href: r('accounts.index'),
+                href: r('payments.index'),
                 icon: Wallet,
             },
         ],
