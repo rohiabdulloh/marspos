@@ -20,28 +20,52 @@ export default function AuthCardLayout({
     description?: string;
 }>) {
     return (
-        <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-muted p-6 md:p-10">
-            <div className="flex w-full max-w-md flex-col gap-6">
-                <Link
-                    href={home()}
-                    className="flex items-center gap-2 self-center font-medium"
-                >
-                    <div className="flex h-9 w-9 items-center justify-center">
-                        <AppLogoIcon className="size-9 fill-current text-black dark:text-white" />
-                    </div>
-                </Link>
+        <div className="min-h-svh bg-slate-50">
+            <div className="mx-auto flex min-h-svh w-full max-w-md flex-col justify-center px-6 py-10">
 
-                <div className="flex flex-col gap-6">
-                    <Card className="rounded-xl">
-                        <CardHeader className="px-10 pt-8 pb-0 text-center">
-                            <CardTitle className="text-xl">{title}</CardTitle>
-                            <CardDescription>{description}</CardDescription>
-                        </CardHeader>
-                        <CardContent className="px-10 py-8">
-                            {children}
-                        </CardContent>
-                    </Card>
+                {/* Logo */}
+                <div className="mb-8 flex justify-center">
+                    <Link
+                        href={home()}
+                        className="flex items-center gap-3"
+                    >
+                        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-green-600">
+                            <AppLogoIcon className="size-7 fill-current text-white" />
+                        </div>
+
+                        <div className="text-left">
+                            <div className="text-xl font-bold text-slate-900">
+                                TaniPOS
+                            </div>
+
+                            <div className="text-xs text-slate-500">
+                                Point of Sale System
+                            </div>
+                        </div>
+                    </Link>
                 </div>
+
+                {/* Card */}
+                <Card className="rounded-2xl border-slate-200 shadow-sm">
+                    <CardHeader className="px-6 pt-7 text-center sm:px-8">
+                        <CardTitle className="text-2xl font-bold tracking-tight text-slate-900">
+                            {title}
+                        </CardTitle>
+
+                        <CardDescription className="mt-2 text-sm leading-6 text-slate-500">
+                            {description}
+                        </CardDescription>
+                    </CardHeader>
+
+                    <CardContent className="px-6 pb-7 sm:px-8">
+                        {children}
+                    </CardContent>
+                </Card>
+
+                {/* Footer */}
+                <p className="mt-6 text-center text-xs text-slate-400">
+                    © {new Date().getFullYear()} TaniPOS. All rights reserved.
+                </p>
             </div>
         </div>
     );

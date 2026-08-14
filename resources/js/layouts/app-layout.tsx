@@ -1,33 +1,51 @@
-import AppLayoutTemplate from '@/layouts/app/app-sidebar-layout';
-import type { BreadcrumbItem } from '@/types';
+import { useEffect, useRef } from 'react';
 import { usePage } from '@inertiajs/react';
 import { toast } from 'sonner';
-import { useRef, useEffect } from 'react';
+
+import AppSidebarLayout from '@/layouts/app/app-sidebar-layout';
+import AppGlobalStyle from '@/layouts/app/app-global-style';
+import type { BreadcrumbItem } from '@/types';
+import type { PageProps as InertiaPageProps } from '@inertiajs/core';
+
+interface AppLayoutProps {
+    breadcrumbs?: BreadcrumbItem[];
+    children: React.ReactNode;
+}
+
+interface FlashProps {
+    success?: string;
+    error?: string;
+}
+
+interface AppPageProps extends InertiaPageProps {
+    flash?: FlashProps;
+}
 
 export default function AppLayout({
     breadcrumbs = [],
     children,
-}: {
-    breadcrumbs?: BreadcrumbItem[];
-    children: React.ReactNode;
-}) {
-    
-    //Menampilkan Toast
-    const { flash }: any = usePage().props;
+}: AppLayoutProps) {
+    const { flash } = usePage<AppPageProps>().props;
+
     const lastMessage = useRef<string | null>(null);
 
     useEffect(() => {
         const message = flash?.success || flash?.error;
-        if (!message) return;
 
-        // 🔥 cegah duplicate
-        if (lastMessage.current === message) return;
+        if (!message) {
+            return;
+        }
 
-        if (flash.success) {
+        // Mencegah toast yang sama muncul dua kali
+        if (lastMessage.current === message) {
+            return;
+        }
+
+        if (flash?.success) {
             toast.success(flash.success);
         }
 
-        if (flash.error) {
+        if (flash?.error) {
             toast.error(flash.error);
         }
 
@@ -35,8 +53,12 @@ export default function AppLayout({
     }, [flash?.success, flash?.error]);
 
     return (
-        <AppLayoutTemplate breadcrumbs={breadcrumbs}>
-            {children}
-        </AppLayoutTemplate>
+        <>
+            <AppGlobalStyle />
+
+            <AppSidebarLayout breadcrumbs={breadcrumbs}>
+                {children}
+            </AppSidebarLayout>
+        </>
     );
 }

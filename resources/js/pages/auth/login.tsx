@@ -1,12 +1,15 @@
 import { Form, Head } from '@inertiajs/react';
-import InputError from '@/components/input-error';
-import PasswordInput from '@/components/password-input';
-import TextLink from '@/components/text-link';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Spinner } from '@/components/ui/spinner';
+import {
+    Lock,
+    Mail,
+    MonitorSmartphone,
+} from 'lucide-react';
+
+import AuthButton from '@/components/auth/auth-button';
+import AuthCheckbox from '@/components/auth/auth-checkbox';
+import AuthDivider from '@/components/auth/auth-divider';
+import AuthField from '@/components/auth/auth-field';
+
 import { register } from '@/routes';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
@@ -29,93 +32,120 @@ export default function Login({
             <Form
                 {...store.form()}
                 resetOnSuccess={['password']}
-                className="flex flex-col gap-6"
+                className="tm-anim"
             >
                 {({ processing, errors }) => (
                     <>
-                        <div className="grid gap-6">
-                            <div className="grid gap-2">
-                                <Label htmlFor="email">Email address</Label>
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    name="email"
-                                    required
-                                    autoFocus
-                                    tabIndex={1}
-                                    autoComplete="email"
-                                    placeholder="email@example.com"
-                                />
-                                <InputError message={errors.email} />
+                        {/* Status */}
+                        {status && (
+                            <div className="mb-5 rounded-lg border border-[var(--success)]/20 bg-[var(--success-soft)] px-4 py-3 text-sm text-[var(--success)]">
+                                {status}
                             </div>
+                        )}
 
-                            <div className="grid gap-2">
-                                <div className="flex items-center">
-                                    <Label htmlFor="password">Password</Label>
-                                    {canResetPassword && (
-                                        <TextLink
-                                            href={request()}
-                                            className="ml-auto text-sm"
-                                            tabIndex={5}
-                                        >
-                                            Forgot password?
-                                        </TextLink>
-                                    )}
-                                </div>
-                                <PasswordInput
-                                    id="password"
-                                    name="password"
-                                    required
-                                    tabIndex={2}
-                                    autoComplete="current-password"
-                                    placeholder="Password"
-                                />
-                                <InputError message={errors.password} />
-                            </div>
+                        {/* Form */}
+                        <div>
+                            {/* Email */}
+                            <AuthField
+                                id="email"
+                                name="email"
+                                label="Email"
+                                icon={Mail}
+                                type="email"
+                                required
+                                autoFocus
+                                autoComplete="email"
+                                tabIndex={1}
+                                placeholder="nama@tokoanda.id"
+                                error={errors.email}
+                            />
 
-                            <div className="flex items-center space-x-3">
-                                <Checkbox
+                            {/* Password */}
+                            <AuthField
+                                id="password"
+                                name="password"
+                                label="Kata Sandi"
+                                icon={Lock}
+                                type="password"
+                                required
+                                tabIndex={2}
+                                autoComplete="current-password"
+                                placeholder="Masukkan kata sandi"
+                                error={errors.password}
+                            />
+
+                            {/* Remember + Forgot */}
+                            <div className="mb-[22px] flex items-center justify-between">
+                                <AuthCheckbox
                                     id="remember"
                                     name="remember"
                                     tabIndex={3}
-                                />
-                                <Label htmlFor="remember">Remember me</Label>
+                                >
+                                    Ingat saya
+                                </AuthCheckbox>
+
+                                {canResetPassword && (
+                                    <a
+                                        href={request().url}
+                                        tabIndex={5}
+                                        className="tm-focus text-[12.8px] font-semibold text-[var(--primary)] hover:text-[var(--primary-dark)]"
+                                    >
+                                        Lupa kata sandi?
+                                    </a>
+                                )}
                             </div>
 
-                            <Button
+                            {/* Login */}
+                            <AuthButton
                                 type="submit"
-                                className="mt-4 w-full"
+                                full
+                                size="lg"
+                                loading={processing}
                                 tabIndex={4}
-                                disabled={processing}
                                 data-test="login-button"
                             >
-                                {processing && <Spinner />}
-                                Log in
-                            </Button>
-                        </div>
+                                {processing
+                                    ? 'Memeriksa...'
+                                    : 'Masuk'}
+                            </AuthButton>
 
-                        {canRegister && (
-                            <div className="text-center text-sm text-muted-foreground">
-                                Don't have an account?{' '}
-                                <TextLink href={register()} tabIndex={5}>
-                                    Sign up
-                                </TextLink>
-                            </div>
-                        )}
+                            {/* Divider */}
+                            <AuthDivider />
+
+                            {/* Cashier PIN */}
+                            <AuthButton
+                                type="button"
+                                full
+                                variant="secondary"
+                                size="lg"
+                                icon={MonitorSmartphone}
+                            >
+                                Masuk sebagai Kasir (PIN)
+                            </AuthButton>
+
+                            {/* Register */}
+                            {canRegister && (
+                                <p className="mt-[26px] text-center text-[13px] text-[var(--text-soft)]">
+                                    Belum punya akun toko?{' '}
+
+                                    <a
+                                        href={register().url}
+                                        tabIndex={6}
+                                        className="tm-focus font-bold text-[var(--primary)] hover:text-[var(--primary-dark)]"
+                                    >
+                                        Daftar sekarang
+                                    </a>
+                                </p>
+                            )}
+                        </div>
                     </>
                 )}
             </Form>
-
-            {status && (
-                <div className="mb-4 text-center text-sm font-medium text-green-600">
-                    {status}
-                </div>
-            )}
         </>
     );
 }
 
 Login.layout = {
-    title: 'Log in to your account',
-    description: 'Enter your email and password below to log in',
+    title: 'Masuk ke akun Anda',
+    description: 'Kelola penjualan dan stok toko Anda hari ini.',
 };

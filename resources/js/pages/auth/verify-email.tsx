@@ -1,46 +1,85 @@
-// Components
 import { Form, Head } from '@inertiajs/react';
+import {
+    MailCheck,
+} from 'lucide-react';
+
+import AuthButton from '@/components/auth/auth-button';
 import TextLink from '@/components/text-link';
-import { Button } from '@/components/ui/button';
-import { Spinner } from '@/components/ui/spinner';
+
 import { logout } from '@/routes';
 import { send } from '@/routes/verification';
 
-export default function VerifyEmail({ status }: { status?: string }) {
+export default function VerifyEmail({
+    status,
+}: {
+    status?: string;
+}) {
     return (
         <>
-            <Head title="Email verification" />
+            <Head title="Verifikasi Email" />
 
-            {status === 'verification-link-sent' && (
-                <div className="mb-4 text-center text-sm font-medium text-green-600">
-                    A new verification link has been sent to the email address
-                    you provided during registration.
+            <div className="tm-anim">
+                {/* Icon */}
+                <div className="mb-5 flex justify-center">
+                    <div className="flex size-14 items-center justify-center rounded-full bg-[var(--primary-soft)]">
+                        <MailCheck
+                            size={28}
+                            strokeWidth={1.8}
+                            className="text-[var(--primary)]"
+                        />
+                    </div>
                 </div>
-            )}
 
-            <Form {...send.form()} className="space-y-6 text-center">
-                {({ processing }) => (
-                    <>
-                        <Button disabled={processing} variant="secondary">
-                            {processing && <Spinner />}
-                            Resend verification email
-                        </Button>
-
-                        <TextLink
-                            href={logout()}
-                            className="mx-auto block text-sm"
-                        >
-                            Log out
-                        </TextLink>
-                    </>
+                {/* Status */}
+                {status === 'verification-link-sent' && (
+                    <div className="mb-5 rounded-lg border border-[var(--success)]/20 bg-[var(--success-soft)] px-4 py-3 text-center text-sm font-medium text-[var(--success)]">
+                        Tautan verifikasi baru telah dikirim ke alamat
+                        email yang Anda gunakan saat mendaftar.
+                    </div>
                 )}
-            </Form>
+
+                {/* Description */}
+                <p className="mb-6 text-center text-[13px] leading-5 text-[var(--text-soft)]">
+                    Jika Anda belum menerima email, silakan periksa folder
+                    spam atau kirim ulang tautan verifikasi.
+                </p>
+
+                {/* Resend */}
+                <Form
+                    {...send.form()}
+                    className="space-y-5 text-center"
+                >
+                    {({ processing }) => (
+                        <>
+                            <AuthButton
+                                type="submit"
+                                full
+                                size="lg"
+                                loading={processing}
+                            >
+                                {processing
+                                    ? 'Mengirim...'
+                                    : 'Kirim Ulang Email Verifikasi'}
+                            </AuthButton>
+
+                            {/* Logout */}
+                            <TextLink
+                                href={logout()}
+                                method="post"
+                                className="mx-auto block text-[13px]"
+                            >
+                                Keluar dari akun
+                            </TextLink>
+                        </>
+                    )}
+                </Form>
+            </div>
         </>
     );
 }
 
 VerifyEmail.layout = {
-    title: 'Verify email',
+    title: 'Verifikasi email',
     description:
-        'Please verify your email address by clicking on the link we just emailed to you.',
+        'Silakan verifikasi alamat email Anda dengan mengklik tautan yang telah kami kirimkan.',
 };

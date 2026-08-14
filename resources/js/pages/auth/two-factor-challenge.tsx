@@ -1,19 +1,25 @@
-import { Form, Head, setLayoutProps } from '@inertiajs/react';
+import { Form, Head, setLayoutProps  } from '@inertiajs/react';
 import { REGEXP_ONLY_DIGITS } from 'input-otp';
 import { useMemo, useState } from 'react';
-import InputError from '@/components/input-error';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { KeyRound, ShieldCheck } from 'lucide-react';
+
+import AuthButton from '@/components/auth/auth-button';
+import AuthField from '@/components/auth/auth-field';
+import TextLink from '@/components/text-link';
+
 import {
     InputOTP,
     InputOTPGroup,
     InputOTPSlot,
 } from '@/components/ui/input-otp';
+
 import { OTP_MAX_LENGTH } from '@/hooks/use-two-factor-auth';
 import { store } from '@/routes/two-factor/login';
 
 export default function TwoFactorChallenge() {
-    const [showRecoveryInput, setShowRecoveryInput] = useState<boolean>(false);
+    const [showRecoveryInput, setShowRecoveryInput] =
+        useState<boolean>(false);
+
     const [code, setCode] = useState<string>('');
 
     const authConfigContent = useMemo<{
@@ -23,18 +29,20 @@ export default function TwoFactorChallenge() {
     }>(() => {
         if (showRecoveryInput) {
             return {
-                title: 'Recovery code',
+                title: 'Kode pemulihan',
                 description:
-                    'Please confirm access to your account by entering one of your emergency recovery codes.',
-                toggleText: 'login using an authentication code',
+                    'Masukkan salah satu kode pemulihan untuk mengakses kembali akun Anda.',
+                toggleText:
+                    'masuk menggunakan kode autentikasi',
             };
         }
 
         return {
-            title: 'Authentication code',
+            title: 'Verifikasi dua faktor',
             description:
-                'Enter the authentication code provided by your authenticator application.',
-            toggleText: 'login using a recovery code',
+                'Masukkan kode autentikasi dari aplikasi authenticator Anda untuk melanjutkan.',
+            toggleText:
+                'masuk menggunakan kode pemulihan',
         };
     }, [showRecoveryInput]);
 
@@ -43,7 +51,9 @@ export default function TwoFactorChallenge() {
         description: authConfigContent.description,
     });
 
-    const toggleRecoveryMode = (clearErrors: () => void): void => {
+    const toggleRecoveryMode = (
+        clearErrors: () => void,
+    ): void => {
         setShowRecoveryInput(!showRecoveryInput);
         clearErrors();
         setCode('');
@@ -51,77 +61,135 @@ export default function TwoFactorChallenge() {
 
     return (
         <>
-            <Head title="Two-factor authentication" />
+            <Head title="Verifikasi dua faktor" />
 
-            <div className="space-y-6">
+            <div className="tm-anim">
                 <Form
                     {...store.form()}
-                    className="space-y-4"
+                    className="space-y-5"
                     resetOnError
                     resetOnSuccess={!showRecoveryInput}
                 >
-                    {({ errors, processing, clearErrors }) => (
+                    {({
+                        errors,
+                        processing,
+                        clearErrors,
+                    }) => (
                         <>
                             {showRecoveryInput ? (
                                 <>
-                                    <Input
+                                    {/* Recovery Code */}
+                                    <AuthField
+                                        id="recovery_code"
                                         name="recovery_code"
+                                        label="Kode Pemulihan"
+                                        icon={KeyRound}
                                         type="text"
-                                        placeholder="Enter recovery code"
-                                        autoFocus={showRecoveryInput}
+                                        placeholder="Masukkan kode pemulihan"
+                                        autoFocus
                                         required
-                                    />
-                                    <InputError
-                                        message={errors.recovery_code}
+                                        autoComplete="off"
+                                        error={errors.recovery_code}
                                     />
                                 </>
                             ) : (
-                                <div className="flex flex-col items-center justify-center space-y-3 text-center">
-                                    <div className="flex w-full items-center justify-center">
+                                <>
+                                    {/* Authentication Code */}
+                                    <div className="flex flex-col items-center">
+                                        <div className="mb-4 flex size-12 items-center justify-center rounded-full bg-[var(--primary-soft)]">
+                                            <ShieldCheck
+                                                size={24}
+                                                strokeWidth={1.8}
+                                                className="text-[var(--primary)]"
+                                            />
+                                        </div>
+
+                                        <label className="mb-3 text-[12.5px] font-semibold text-[var(--text-soft)]">
+                                            Kode Autentikasi
+                                        </label>
+
                                         <InputOTP
                                             name="code"
                                             maxLength={OTP_MAX_LENGTH}
                                             value={code}
-                                            onChange={(value) => setCode(value)}
+                                            onChange={(value) =>
+                                                setCode(value)
+                                            }
                                             disabled={processing}
-                                            pattern={REGEXP_ONLY_DIGITS}
+                                            pattern={
+                                                REGEXP_ONLY_DIGITS
+                                            }
                                         >
-                                            <InputOTPGroup>
+                                            <InputOTPGroup className="gap-2">
                                                 {Array.from(
-                                                    { length: OTP_MAX_LENGTH },
+                                                    {
+                                                        length: OTP_MAX_LENGTH,
+                                                    },
                                                     (_, index) => (
                                                         <InputOTPSlot
                                                             key={index}
                                                             index={index}
+                                                            className="
+                                                                size-11
+                                                                rounded-lg
+                                                                border-[1.5px]
+                                                                border-[var(--border)]
+                                                                bg-white
+                                                                text-base
+                                                                font-semibold
+                                                                text-[var(--text)]
+                                                                shadow-none
+                                                                first:rounded-lg
+                                                                first:border-l
+                                                                last:rounded-lg
+                                                                focus-within:border-[var(--primary)]
+                                                                focus-within:ring-2
+                                                                focus-within:ring-[var(--primary)]/10
+                                                            "
                                                         />
                                                     ),
                                                 )}
                                             </InputOTPGroup>
                                         </InputOTP>
+
+                                        {errors.code && (
+                                            <p className="mt-2 text-xs font-medium text-[var(--danger)]">
+                                                {errors.code}
+                                            </p>
+                                        )}
                                     </div>
-                                    <InputError message={errors.code} />
-                                </div>
+                                </>
                             )}
 
-                            <Button
+                            {/* Submit */}
+                            <AuthButton
                                 type="submit"
-                                className="w-full"
-                                disabled={processing}
+                                full
+                                size="lg"
+                                loading={processing}
                             >
-                                Continue
-                            </Button>
+                                {processing
+                                    ? 'Memverifikasi...'
+                                    : 'Lanjutkan'}
+                            </AuthButton>
 
-                            <div className="text-center text-sm text-muted-foreground">
-                                <span>or you can </span>
-                                <button
-                                    type="button"
-                                    className="cursor-pointer text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
-                                    onClick={() =>
-                                        toggleRecoveryMode(clearErrors)
-                                    }
+                            {/* Toggle */}
+                            <div className="text-center text-[13px] text-[var(--text-soft)]">
+                                <span>atau </span>
+
+                                <TextLink
+                                    href="#"
+                                    onClick={(event) => {
+                                        event.preventDefault();
+
+                                        toggleRecoveryMode(
+                                            clearErrors,
+                                        );
+                                    }}
+                                    className="font-semibold"
                                 >
                                     {authConfigContent.toggleText}
-                                </button>
+                                </TextLink>
                             </div>
                         </>
                     )}

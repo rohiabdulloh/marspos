@@ -1,4 +1,5 @@
-import AuthLayoutTemplate from '@/layouts/auth/auth-simple-layout';
+import AuthLayoutTemplate from '@/layouts/auth/auth-split-layout';
+import AuthGlobalStyle from '@/layouts/auth/auth-global-style';
 
 export default function AuthLayout({
     title = '',
@@ -10,8 +11,13 @@ export default function AuthLayout({
     children: React.ReactNode;
 }) {
     return (
-        <AuthLayoutTemplate title={title} description={description}>
-            {children}
-        </AuthLayoutTemplate>
+        <>
+        <AuthGlobalStyle />
+        <div className="tm-root">
+            <AuthLayoutTemplate title={title} description={description}>
+                {children}
+            </AuthLayoutTemplate>
+        </div>
+        </>
     );
 }

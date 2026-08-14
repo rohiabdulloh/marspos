@@ -9,29 +9,47 @@ export default function AuthSimpleLayout({
     description,
 }: AuthLayoutProps) {
     return (
-        <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-background p-6 md:p-10">
-            <div className="w-full max-w-sm">
-                <div className="flex flex-col gap-8">
-                    <div className="flex flex-col items-center gap-4">
-                        <Link
-                            href={home()}
-                            className="flex flex-col items-center gap-2 font-medium"
-                        >
-                            <div className="mb-1 flex h-9 w-9 items-center justify-center rounded-md">
-                                <AppLogoIcon className="size-9 fill-current text-[var(--foreground)] dark:text-white" />
-                            </div>
-                            <span className="sr-only">{title}</span>
-                        </Link>
+        <div className="min-h-svh bg-white">
+            <div className="mx-auto flex min-h-svh w-full max-w-md flex-col justify-center px-6 py-10">
 
-                        <div className="space-y-2 text-center">
-                            <h1 className="text-xl font-medium">{title}</h1>
-                            <p className="text-center text-sm text-muted-foreground">
-                                {description}
-                            </p>
+                {/* Logo */}
+                <div className="mb-10 flex justify-center">
+                    <Link
+                        href={home()}
+                        className="flex flex-col items-center"
+                    >
+                        <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-green-600">
+                            <AppLogoIcon className="size-7 fill-current text-white" />
                         </div>
-                    </div>
-                    {children}
+
+                        <span className="text-xl font-bold text-slate-900">
+                            TaniPOS
+                        </span>
+
+                        <span className="mt-1 text-xs text-slate-500">
+                            Point of Sale System
+                        </span>
+                    </Link>
                 </div>
+
+                {/* Heading */}
+                <div className="mb-8 text-center">
+                    <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+                        {title}
+                    </h1>
+
+                    <p className="mt-2 text-sm leading-6 text-slate-500">
+                        {description}
+                    </p>
+                </div>
+
+                {/* Content */}
+                {children}
+
+                {/* Footer */}
+                <p className="mt-10 text-center text-xs text-slate-400">
+                    © {new Date().getFullYear()} TaniPOS
+                </p>
             </div>
         </div>
     );

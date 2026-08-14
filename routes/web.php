@@ -14,12 +14,12 @@ use App\Http\Controllers\Pages\BillController;
 use App\Http\Controllers\Pages\PaymentController;
 
 
-Route::inertia('/', 'welcome', [
+Route::inertia('/home', 'welcome', [
     'canRegister' => Features::enabled(Features::registration()),
 ])->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::inertia('dashboard', 'dashboard')->name('dashboard');
+    Route::inertia('/', 'dashboard')->name('dashboard');
     
     Route::resource('accounts', AccountController::class);
     Route::resource('customers', CustomerController::class);
