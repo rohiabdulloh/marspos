@@ -36,13 +36,17 @@ class SaleItem extends Model
             'quantity' => 'decimal:3',
             'conversion_factor' => 'decimal:3',
             'base_quantity' => 'decimal:3',
+
             'unit_price' => 'decimal:2',
             'cost_price' => 'decimal:2',
             'subtotal' => 'decimal:2',
+
             'discount_percent' => 'decimal:2',
             'discount_amount' => 'decimal:2',
+
             'tax_percent' => 'decimal:2',
             'tax_amount' => 'decimal:2',
+
             'total' => 'decimal:2',
         ];
     }

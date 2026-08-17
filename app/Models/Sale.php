@@ -38,6 +38,7 @@ class Sale extends Model
     {
         return [
             'transaction_date' => 'datetime',
+
             'subtotal' => 'decimal:2',
             'discount_amount' => 'decimal:2',
             'tax_amount' => 'decimal:2',
@@ -47,6 +48,7 @@ class Sale extends Model
             'paid_amount' => 'decimal:2',
             'change_amount' => 'decimal:2',
             'due_amount' => 'decimal:2',
+
             'cancelled_at' => 'datetime',
         ];
     }

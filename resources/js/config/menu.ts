@@ -30,13 +30,15 @@ import {
     ScrollText,
 } from 'lucide-react';
 
+import r from '@/lib/route';
+
 export const APP_MENU = [
     {
         items: [
             {
                 id: 'dashboard',
                 label: 'Dashboard',
-                href: '/dashboard',
+                href: r('dashboard'),
                 icon: LayoutDashboard,
             },
         ],

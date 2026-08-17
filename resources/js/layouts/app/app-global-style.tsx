@@ -3,7 +3,7 @@ export default function AppGlobalStyle() {
         <style>{`
             @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
-            .tm-root {
+            :root {
                 --primary: #2F6B3C;
                 --primary-dark: #1B4229;
                 --primary-soft: #E6EFE7;
@@ -53,7 +53,7 @@ export default function AppGlobalStyle() {
             |--------------------------------------------------------------------------
             */
 
-            html.dark .tm-root {
+            html.dark {
                 --primary: #63A875;
                 --primary-dark: #102619;
                 --primary-soft: #1C3524;

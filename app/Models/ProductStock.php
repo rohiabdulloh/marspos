@@ -18,11 +18,14 @@ class ProductStock extends Model
         'average_cost',
     ];
 
-    protected $casts = [
-        'quantity' => 'decimal:3',
-        'reserved_quantity' => 'decimal:3',
-        'average_cost' => 'decimal:2',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'quantity' => 'decimal:3',
+            'reserved_quantity' => 'decimal:3',
+            'average_cost' => 'decimal:2',
+        ];
+    }
 
     /*
     |--------------------------------------------------------------------------

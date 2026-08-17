@@ -37,6 +37,7 @@ class Purchase extends Model
     {
         return [
             'transaction_date' => 'datetime',
+
             'subtotal' => 'decimal:2',
             'discount_amount' => 'decimal:2',
             'tax_amount' => 'decimal:2',
@@ -45,6 +46,7 @@ class Purchase extends Model
             'grand_total' => 'decimal:2',
             'paid_amount' => 'decimal:2',
             'due_amount' => 'decimal:2',
+
             'cancelled_at' => 'datetime',
         ];
     }

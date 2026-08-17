@@ -14,11 +14,16 @@ class Customer extends Model
     protected $fillable = [
         'code',
         'name',
+        'customer_type_id',
         'phone',
         'email',
         'address',
+        'city',            
+        'province',         
+        'postal_code',     
         'credit_limit',
-        'payment_term',
+        'credit_term_days', 
+        'notes',           
         'is_active',
     ];
 
@@ -26,7 +31,7 @@ class Customer extends Model
     {
         return [
             'credit_limit' => 'decimal:2',
-            'payment_term' => 'integer',
+            'credit_term_days' => 'integer',
             'is_active' => 'boolean',
         ];
     }
@@ -36,6 +41,11 @@ class Customer extends Model
         return $this->hasMany(Sale::class);
     }
 
+    public function customerType()
+    {
+        return $this->belongsTo(CustomerType::class);
+    }
+    
     public function saleReturns()
     {
         return $this->hasMany(SaleReturn::class);

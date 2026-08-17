@@ -13,18 +13,20 @@ class Product extends Model
     protected $fillable = [
         'category_id',
         'brand_id',
-        'name',
+        'base_unit_id',
         'sku',
         'barcode',
+        'name',
+        'type',
         'description',
-        'base_unit_id',
         'purchase_price',
         'selling_price',
         'minimum_stock',
+        'maximum_stock',
+        'has_batch',
+        'has_expiry',
+        'image',
         'is_active',
-        'track_stock',
-        'track_batch',
-        'track_expiry',
     ];
 
     protected function casts(): array
@@ -33,10 +35,11 @@ class Product extends Model
             'purchase_price' => 'decimal:2',
             'selling_price' => 'decimal:2',
             'minimum_stock' => 'decimal:3',
+            'maximum_stock' => 'decimal:3',
+
+            'has_batch' => 'boolean',
+            'has_expiry' => 'boolean',
             'is_active' => 'boolean',
-            'track_stock' => 'boolean',
-            'track_batch' => 'boolean',
-            'track_expiry' => 'boolean',
         ];
     }
 
