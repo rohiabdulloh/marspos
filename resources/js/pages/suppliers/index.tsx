@@ -7,16 +7,16 @@ import { ConfirmDialog } from '@/components/confirm-dialog';
 import { Plus, Pencil, Trash, RotateCcw, AlertTriangle } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ColumnDef } from '@tanstack/react-table';
-import CustomerForm from '@/pages/customers/form';
+import SupplierForm from '@/pages/suppliers/form';
 import r from '@/lib/route';
 
-export default function Index({ customers, customerTypes, filters }: any) {
+export default function Index({ suppliers, filters }: any) {
     const [open, setOpen] = useState(false);
     const [selected, setSelected] = useState<any>(null);
 
     const handleStatusChange = (status: string | null) => {
         router.get(
-            r('customers.index'),
+            r('suppliers.index'),
             { ...filters, status, page: 1 },
             { preserveState: true, replace: true }
         );
@@ -28,14 +28,9 @@ export default function Index({ customers, customerTypes, filters }: any) {
             header: 'Kode',
             cell: ({ row }) => <span className="font-mono text-xs text-muted-foreground">{row.original.code}</span>,
         },
-        { accessorKey: 'name', header: 'Nama Customer' },
-        {
-            accessorKey: 'customer_type',
-            header: 'Tipe',
-            enableSorting: false,
-            cell: ({ row }) => row.original.customer_type?.name || '-',
-        },
-        { accessorKey: 'phone', header: 'Telepon' },
+        { accessorKey: 'name', header: 'Nama Supplier' },
+        { accessorKey: 'contact_person', header: 'Contact Person', cell: ({ row }) => row.original.contact_person || '-' },
+        { accessorKey: 'phone', header: 'Telepon', cell: ({ row }) => row.original.phone || '-' },
         {
             accessorKey: 'is_active',
             header: 'Status',
@@ -59,7 +54,7 @@ export default function Index({ customers, customerTypes, filters }: any) {
                                     size="icon"
                                     variant="outline"
                                     title="Pulihkan Data"
-                                    onClick={() => router.put(r('customers.restore', row.original.id))}
+                                    onClick={() => router.put(r('suppliers.restore', row.original.id))}
                                 >
                                     <RotateCcw size={16} className="text-emerald-600" />
                                 </Button>
@@ -69,10 +64,10 @@ export default function Index({ customers, customerTypes, filters }: any) {
                                             <AlertTriangle size={16} />
                                         </Button>
                                     }
-                                    title="Hapus Permanen Customer?"
+                                    title="Hapus Permanen Supplier?"
                                     description={<>Data <b>{row.original.name}</b> akan dihapus selamanya.</>}
                                     confirmText="Hapus Permanen"
-                                    onConfirm={() => router.delete(r('customers.force-delete', row.original.id))}
+                                    onConfirm={() => router.delete(r('suppliers.force-delete', row.original.id))}
                                 />
                             </>
                         ) : (
@@ -93,10 +88,10 @@ export default function Index({ customers, customerTypes, filters }: any) {
                                             <Trash size={16} />
                                         </Button>
                                     }
-                                    title="Hapus Customer?"
-                                    description={<>Yakin ingin menghapus customer <b>{row.original.name}</b>?</>}
+                                    title="Hapus Supplier?"
+                                    description={<>Yakin ingin menghapus supplier <b>{row.original.name}</b>?</>}
                                     confirmText="Hapus"
-                                    onConfirm={() => router.delete(r('customers.destroy', row.original.id))}
+                                    onConfirm={() => router.delete(r('suppliers.destroy', row.original.id))}
                                 />
                             </>
                         )}
@@ -109,15 +104,15 @@ export default function Index({ customers, customerTypes, filters }: any) {
 
     return (
         <div className="space-y-4">
-            <Head title="Data Customer" />
+            <Head title="Data Supplier" />
 
             <div className="flex justify-between items-center">
                 <div>
-                    <h1 className="text-xl font-bold text-foreground">Data Customer</h1>
-                    <p className="text-sm text-muted-foreground">Kelola informasi pelanggan toko Anda.</p>
+                    <h1 className="text-xl font-bold text-foreground">Data Supplier</h1>
+                    <p className="text-sm text-muted-foreground">Kelola informasi vendor atau pemasok barang.</p>
                 </div>
                 <Button size="lg" onClick={() => { setSelected(null); setOpen(true); }}>
-                    <Plus className="mr-1" size={16} /> Tambah Customer
+                    <Plus className="mr-1" size={16} /> Tambah Supplier
                 </Button>
             </div>
 
@@ -125,17 +120,17 @@ export default function Index({ customers, customerTypes, filters }: any) {
                 <CardContent className="px-4 py-4">
                     <DataTable
                         columns={columns}
-                        data={customers.data}
+                        data={suppliers.data}
                         paginationMeta={{
-                            current_page: customers.current_page,
-                            last_page: customers.last_page,
-                            per_page: customers.per_page,
-                            total: customers.total,
-                            from: customers.from,
-                            to: customers.to,
+                            current_page: suppliers.current_page,
+                            last_page: suppliers.last_page,
+                            per_page: suppliers.per_page,
+                            total: suppliers.total,
+                            from: suppliers.from,
+                            to: suppliers.to,
                         }}
                         filters={filters}
-                        routeName={r('customers.index')}
+                        routeName={r('suppliers.index')}
                         enableSearch={true}
                         enableSorting={true}
                         enablePagination={true}
@@ -159,17 +154,17 @@ export default function Index({ customers, customerTypes, filters }: any) {
                 </CardContent>
             </Card>
 
+            {/* Dialog dengan lebar max-w-4xl agar form leluasa */}
             <Dialog open={open} onOpenChange={(val) => { setOpen(val); if (!val) setSelected(null); }}>
                 <DialogContent className="w-[90vw] md:w-[80vw] md:max-w-4xl max-h-[90vh] overflow-y-auto bg-card text-card-foreground border-border">
                     <DialogHeader>
                         <DialogTitle className="text-lg">
-                            {selected ? 'Edit Customer' : 'Tambah Customer Baru'}
+                            {selected ? 'Edit Supplier' : 'Tambah Supplier Baru'}
                         </DialogTitle>
                     </DialogHeader>
-                    <CustomerForm
+                    <SupplierForm
                         key={selected?.id ?? 'create'}
-                        customer={selected}
-                        customerTypes={customerTypes}
+                        supplier={selected}
                         onSuccess={() => setOpen(false)}
                         onCancel={() => setOpen(false)}
                     />
@@ -182,6 +177,6 @@ export default function Index({ customers, customerTypes, filters }: any) {
 Index.layout = {
     breadcrumbs: [
         { title: 'Dashboard', href: r('dashboard') },
-        { title: 'Customer', href: r('customers.index') },
+        { title: 'Supplier', href: r('suppliers.index') },
     ],
 };

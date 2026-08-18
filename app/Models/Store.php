@@ -11,20 +11,21 @@ class Store extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'name',
         'code',
-        'address',
+        'name',
         'phone',
         'email',
+        'address',
+        'city',
+        'province',
+        'postal_code',
+        'logo',
         'is_active',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'is_active' => 'boolean',
-        ];
-    }
+    protected $casts = [
+        'is_active' => 'boolean',
+    ];
 
     public function users()
     {

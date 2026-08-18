@@ -16,17 +16,19 @@ class Supplier extends Model
         'phone',
         'email',
         'address',
-        'payment_term',
+        'city',
+        'province',
+        'postal_code',
+        'contact_person',
+        'payment_term_days',
+        'notes',
         'is_active',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'payment_term' => 'integer',
-            'is_active' => 'boolean',
-        ];
-    }
+    protected $casts = [
+        'is_active' => 'boolean',
+        'payment_term_days' => 'integer',
+    ];
 
     public function purchases()
     {

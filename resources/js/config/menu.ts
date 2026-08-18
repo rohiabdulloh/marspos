@@ -10,7 +10,9 @@ import {
     Boxes,
     Ruler,
     Users,
+    UserCheck,
     Truck,
+    Store,
     Warehouse,
     ClipboardList,
     ArrowLeftRight,
@@ -114,6 +116,12 @@ export const APP_MENU = [
                 icon: Ruler,
             },
             {
+                id: 'customer-types',
+                label: 'Tipe Pelanggan',
+                href: '/customer-types',
+                icon: UserCheck,
+            },
+            {
                 id: 'customers',
                 label: 'Pelanggan',
                 href: '/customers',
@@ -124,6 +132,12 @@ export const APP_MENU = [
                 label: 'Supplier',
                 href: '/suppliers',
                 icon: Truck,
+            },
+            {
+                id: 'stores',
+                label: 'Toko',
+                href: '/stores',
+                icon: Store,
             },
             {
                 id: 'warehouses',

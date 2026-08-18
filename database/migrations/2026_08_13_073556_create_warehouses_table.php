@@ -28,6 +28,7 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
 
             $table->timestamps();
+            $table->softDeletes();
 
             $table->unique(['store_id', 'code']);
         });

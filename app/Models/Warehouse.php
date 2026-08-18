@@ -12,18 +12,18 @@ class Warehouse extends Model
 
     protected $fillable = [
         'store_id',
-        'name',
         'code',
+        'name',
+        'phone',
         'address',
+        'is_main',
         'is_active',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'is_active' => 'boolean',
-        ];
-    }
+    protected $casts = [
+        'is_main' => 'boolean',
+        'is_active' => 'boolean',
+    ];
 
     public function store()
     {

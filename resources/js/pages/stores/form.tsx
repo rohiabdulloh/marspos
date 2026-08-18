@@ -4,42 +4,37 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import r from '@/lib/route';
 
-export default function CustomerForm({
-    customer = null,
-    customerTypes = [],
+export default function StoreForm({
+    store = null,
     onSuccess,
     onCancel,
 }: any) {
-    const isEdit = !!customer;
+    const isEdit = !!store;
 
     const { data, setData, post, put, errors, processing, reset } = useForm({
-        code: customer?.code || '',
-        name: customer?.name || '',
-        customer_type_id: customer?.customer_type_id ? String(customer.customer_type_id) : '',
-        phone: customer?.phone || '',
-        email: customer?.email || '',
-        address: customer?.address || '',
-        city: customer?.city || '',
-        province: customer?.province || '',
-        postal_code: customer?.postal_code || '',
-        credit_limit: customer?.credit_limit ?? 0,
-        credit_term_days: customer?.credit_term_days ?? 0,
-        notes: customer?.notes || '',
-        is_active: customer?.is_active ?? true,
+        code: store?.code || '',
+        name: store?.name || '',
+        phone: store?.phone || '',
+        email: store?.email || '',
+        address: store?.address || '',
+        city: store?.city || '',
+        province: store?.province || '',
+        postal_code: store?.postal_code || '',
+        logo: store?.logo || '',
+        is_active: store?.is_active ?? true,
     });
 
     function submit(e: any) {
         e.preventDefault();
 
         if (isEdit) {
-            put(r('customers.update', customer.id), {
+            put(r('stores.update', store.id), {
                 onSuccess: () => onSuccess?.(),
             });
         } else {
-            post(r('customers.store'), {
+            post(r('stores.store'), {
                 onSuccess: () => {
                     reset();
                     onSuccess?.();
@@ -53,51 +48,30 @@ export default function CustomerForm({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* KODE */}
                 <div className="space-y-2">
-                    <Label>Kode Customer</Label>
+                    <Label>Kode Toko</Label>
                     <Input
                         className={errors.code ? 'border-red-500' : ''}
                         value={data.code}
                         onChange={(e) => setData('code', e.target.value)}
-                        placeholder="Contoh: CST-001"
+                        placeholder="Contoh: TK-01"
                     />
                     {errors.code && <p className="text-sm text-red-500">{errors.code}</p>}
                 </div>
 
                 {/* NAMA */}
                 <div className="space-y-2">
-                    <Label>Nama Customer</Label>
+                    <Label>Nama Toko Cabang</Label>
                     <Input
                         className={errors.name ? 'border-red-500' : ''}
                         value={data.name}
                         onChange={(e) => setData('name', e.target.value)}
-                        placeholder="Nama Toko / Perorangan"
+                        placeholder="Contoh: Toko Cabang Sudirman"
                     />
                     {errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {/* TIPE CUSTOMER */}
-                <div className="space-y-2">
-                    <Label>Tipe Customer</Label>
-                    <Select
-                        value={data.customer_type_id}
-                        onValueChange={(val) => setData('customer_type_id', val)}
-                    >
-                        <SelectTrigger className={errors.customer_type_id ? 'border-red-500' : ''}>
-                            <SelectValue placeholder="Pilih Tipe" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {customerTypes.map((t: any) => (
-                                <SelectItem key={t.id} value={String(t.id)}>
-                                    {t.name}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                    {errors.customer_type_id && <p className="text-sm text-red-500">{errors.customer_type_id}</p>}
-                </div>
-
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* TELEPON */}
                 <div className="space-y-2">
                     <Label>No. Telepon</Label>
@@ -118,7 +92,7 @@ export default function CustomerForm({
                         className={errors.email ? 'border-red-500' : ''}
                         value={data.email}
                         onChange={(e) => setData('email', e.target.value)}
-                        placeholder="email@example.com"
+                        placeholder="toko@example.com"
                     />
                     {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
                 </div>
@@ -131,7 +105,7 @@ export default function CustomerForm({
                     className={errors.address ? 'border-red-500' : ''}
                     value={data.address}
                     onChange={(e) => setData('address', e.target.value)}
-                    placeholder="Jalan, RT/RW, Kelurahan..."
+                    placeholder="Lokasi fisik toko..."
                 />
                 {errors.address && <p className="text-sm text-red-500">{errors.address}</p>}
             </div>
@@ -166,37 +140,6 @@ export default function CustomerForm({
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* CREDIT LIMIT */}
-                <div className="space-y-2">
-                    <Label>Limit Kredit (Rp)</Label>
-                    <Input
-                        type="number"
-                        value={data.credit_limit}
-                        onChange={(e) => setData('credit_limit', e.target.value)}
-                    />
-                </div>
-                {/* CREDIT TERM */}
-                <div className="space-y-2">
-                    <Label>Termin Kredit (Hari)</Label>
-                    <Input
-                        type="number"
-                        value={data.credit_term_days}
-                        onChange={(e) => setData('credit_term_days', e.target.value)}
-                    />
-                </div>
-            </div>
-
-            {/* NOTES */}
-            <div className="space-y-2">
-                <Label>Catatan</Label>
-                <Textarea
-                    value={data.notes}
-                    onChange={(e) => setData('notes', e.target.value)}
-                    placeholder="Catatan khusus pelanggan..."
-                />
-            </div>
-
             {/* IS ACTIVE */}
             <div className="flex items-center space-x-2 pt-2">
                 <Checkbox
@@ -213,7 +156,7 @@ export default function CustomerForm({
                     Batal
                 </Button>
                 <Button type="submit" size="lg" disabled={processing}>
-                    {processing ? 'Menyimpan...' : (isEdit ? 'Update Customer' : 'Simpan Customer')}
+                    {processing ? 'Menyimpan...' : (isEdit ? 'Update Toko' : 'Simpan Toko')}
                 </Button>
             </div>
         </form>

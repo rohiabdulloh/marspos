@@ -4,42 +4,39 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import r from '@/lib/route';
 
-export default function CustomerForm({
-    customer = null,
-    customerTypes = [],
+export default function SupplierForm({
+    supplier = null,
     onSuccess,
     onCancel,
 }: any) {
-    const isEdit = !!customer;
+    const isEdit = !!supplier;
 
     const { data, setData, post, put, errors, processing, reset } = useForm({
-        code: customer?.code || '',
-        name: customer?.name || '',
-        customer_type_id: customer?.customer_type_id ? String(customer.customer_type_id) : '',
-        phone: customer?.phone || '',
-        email: customer?.email || '',
-        address: customer?.address || '',
-        city: customer?.city || '',
-        province: customer?.province || '',
-        postal_code: customer?.postal_code || '',
-        credit_limit: customer?.credit_limit ?? 0,
-        credit_term_days: customer?.credit_term_days ?? 0,
-        notes: customer?.notes || '',
-        is_active: customer?.is_active ?? true,
+        code: supplier?.code || '',
+        name: supplier?.name || '',
+        phone: supplier?.phone || '',
+        email: supplier?.email || '',
+        address: supplier?.address || '',
+        city: supplier?.city || '',
+        province: supplier?.province || '',
+        postal_code: supplier?.postal_code || '',
+        contact_person: supplier?.contact_person || '',
+        payment_term_days: supplier?.payment_term_days ?? 0,
+        notes: supplier?.notes || '',
+        is_active: supplier?.is_active ?? true,
     });
 
     function submit(e: any) {
         e.preventDefault();
 
         if (isEdit) {
-            put(r('customers.update', customer.id), {
+            put(r('suppliers.update', supplier.id), {
                 onSuccess: () => onSuccess?.(),
             });
         } else {
-            post(r('customers.store'), {
+            post(r('suppliers.store'), {
                 onSuccess: () => {
                     reset();
                     onSuccess?.();
@@ -53,49 +50,38 @@ export default function CustomerForm({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* KODE */}
                 <div className="space-y-2">
-                    <Label>Kode Customer</Label>
+                    <Label>Kode Supplier</Label>
                     <Input
                         className={errors.code ? 'border-red-500' : ''}
                         value={data.code}
                         onChange={(e) => setData('code', e.target.value)}
-                        placeholder="Contoh: CST-001"
+                        placeholder="Contoh: SUP-001"
                     />
                     {errors.code && <p className="text-sm text-red-500">{errors.code}</p>}
                 </div>
 
                 {/* NAMA */}
                 <div className="space-y-2">
-                    <Label>Nama Customer</Label>
+                    <Label>Nama Supplier / Perusahaan</Label>
                     <Input
                         className={errors.name ? 'border-red-500' : ''}
                         value={data.name}
                         onChange={(e) => setData('name', e.target.value)}
-                        placeholder="Nama Toko / Perorangan"
+                        placeholder="PT Maju Sejahtera"
                     />
                     {errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
                 </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {/* TIPE CUSTOMER */}
+                {/* CONTACT PERSON */}
                 <div className="space-y-2">
-                    <Label>Tipe Customer</Label>
-                    <Select
-                        value={data.customer_type_id}
-                        onValueChange={(val) => setData('customer_type_id', val)}
-                    >
-                        <SelectTrigger className={errors.customer_type_id ? 'border-red-500' : ''}>
-                            <SelectValue placeholder="Pilih Tipe" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {customerTypes.map((t: any) => (
-                                <SelectItem key={t.id} value={String(t.id)}>
-                                    {t.name}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                    {errors.customer_type_id && <p className="text-sm text-red-500">{errors.customer_type_id}</p>}
+                    <Label>Contact Person</Label>
+                    <Input
+                        value={data.contact_person}
+                        onChange={(e) => setData('contact_person', e.target.value)}
+                        placeholder="Nama narahubung"
+                    />
                 </div>
 
                 {/* TELEPON */}
@@ -118,7 +104,7 @@ export default function CustomerForm({
                         className={errors.email ? 'border-red-500' : ''}
                         value={data.email}
                         onChange={(e) => setData('email', e.target.value)}
-                        placeholder="email@example.com"
+                        placeholder="supplier@example.com"
                     />
                     {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
                 </div>
@@ -131,7 +117,7 @@ export default function CustomerForm({
                     className={errors.address ? 'border-red-500' : ''}
                     value={data.address}
                     onChange={(e) => setData('address', e.target.value)}
-                    placeholder="Jalan, RT/RW, Kelurahan..."
+                    placeholder="Jalan, Gedung, Kompleks..."
                 />
                 {errors.address && <p className="text-sm text-red-500">{errors.address}</p>}
             </div>
@@ -143,7 +129,7 @@ export default function CustomerForm({
                     <Input
                         value={data.city}
                         onChange={(e) => setData('city', e.target.value)}
-                        placeholder="Contoh: Tegal"
+                        placeholder="Contoh: Jakarta Pusat"
                     />
                 </div>
                 {/* PROVINSI */}
@@ -152,7 +138,7 @@ export default function CustomerForm({
                     <Input
                         value={data.province}
                         onChange={(e) => setData('province', e.target.value)}
-                        placeholder="Contoh: Jawa Tengah"
+                        placeholder="Contoh: DKI Jakarta"
                     />
                 </div>
                 {/* KODE POS */}
@@ -161,28 +147,20 @@ export default function CustomerForm({
                     <Input
                         value={data.postal_code}
                         onChange={(e) => setData('postal_code', e.target.value)}
-                        placeholder="52192"
+                        placeholder="10110"
                     />
                 </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* CREDIT LIMIT */}
+                {/* PAYMENT TERM */}
                 <div className="space-y-2">
-                    <Label>Limit Kredit (Rp)</Label>
+                    <Label>Termin Pembayaran (Hari)</Label>
                     <Input
                         type="number"
-                        value={data.credit_limit}
-                        onChange={(e) => setData('credit_limit', e.target.value)}
-                    />
-                </div>
-                {/* CREDIT TERM */}
-                <div className="space-y-2">
-                    <Label>Termin Kredit (Hari)</Label>
-                    <Input
-                        type="number"
-                        value={data.credit_term_days}
-                        onChange={(e) => setData('credit_term_days', e.target.value)}
+                        value={data.payment_term_days}
+                        onChange={(e) => setData('payment_term_days', e.target.value)}
+                        placeholder="0"
                     />
                 </div>
             </div>
@@ -193,7 +171,7 @@ export default function CustomerForm({
                 <Textarea
                     value={data.notes}
                     onChange={(e) => setData('notes', e.target.value)}
-                    placeholder="Catatan khusus pelanggan..."
+                    placeholder="Catatan tambahan..."
                 />
             </div>
 
@@ -213,7 +191,7 @@ export default function CustomerForm({
                     Batal
                 </Button>
                 <Button type="submit" size="lg" disabled={processing}>
-                    {processing ? 'Menyimpan...' : (isEdit ? 'Update Customer' : 'Simpan Customer')}
+                    {processing ? 'Menyimpan...' : (isEdit ? 'Update Supplier' : 'Simpan Supplier')}
                 </Button>
             </div>
         </form>

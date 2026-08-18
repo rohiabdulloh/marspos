@@ -7,16 +7,16 @@ import { ConfirmDialog } from '@/components/confirm-dialog';
 import { Plus, Pencil, Trash, RotateCcw, AlertTriangle } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ColumnDef } from '@tanstack/react-table';
-import CustomerForm from '@/pages/customers/form';
+import WarehouseForm from '@/pages/warehouses/form';
 import r from '@/lib/route';
 
-export default function Index({ customers, customerTypes, filters }: any) {
+export default function Index({ warehouses, stores, filters }: any) {
     const [open, setOpen] = useState(false);
     const [selected, setSelected] = useState<any>(null);
 
     const handleStatusChange = (status: string | null) => {
         router.get(
-            r('customers.index'),
+            r('warehouses.index'),
             { ...filters, status, page: 1 },
             { preserveState: true, replace: true }
         );
@@ -28,14 +28,24 @@ export default function Index({ customers, customerTypes, filters }: any) {
             header: 'Kode',
             cell: ({ row }) => <span className="font-mono text-xs text-muted-foreground">{row.original.code}</span>,
         },
-        { accessorKey: 'name', header: 'Nama Customer' },
+        { accessorKey: 'name', header: 'Nama Gudang' },
         {
-            accessorKey: 'customer_type',
-            header: 'Tipe',
-            enableSorting: false,
-            cell: ({ row }) => row.original.customer_type?.name || '-',
+            accessorKey: 'store',
+            header: 'Toko',
+            cell: ({ row }) => row.original.store?.name || '-',
         },
-        { accessorKey: 'phone', header: 'Telepon' },
+        { accessorKey: 'phone', header: 'Telepon', cell: ({ row }) => row.original.phone || '-' },
+        {
+            accessorKey: 'is_main',
+            header: 'Utama',
+            cell: ({ row }) => (
+                row.original.is_main ? (
+                    <span className="px-2 py-1 text-xs rounded-full font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
+                        Utama
+                    </span>
+                ) : '-'
+            ),
+        },
         {
             accessorKey: 'is_active',
             header: 'Status',
@@ -59,7 +69,7 @@ export default function Index({ customers, customerTypes, filters }: any) {
                                     size="icon"
                                     variant="outline"
                                     title="Pulihkan Data"
-                                    onClick={() => router.put(r('customers.restore', row.original.id))}
+                                    onClick={() => router.put(r('warehouses.restore', row.original.id))}
                                 >
                                     <RotateCcw size={16} className="text-emerald-600" />
                                 </Button>
@@ -69,10 +79,10 @@ export default function Index({ customers, customerTypes, filters }: any) {
                                             <AlertTriangle size={16} />
                                         </Button>
                                     }
-                                    title="Hapus Permanen Customer?"
-                                    description={<>Data <b>{row.original.name}</b> akan dihapus selamanya.</>}
+                                    title="Hapus Permanen Gudang?"
+                                    description={<>Data gudang <b>{row.original.name}</b> akan dihapus selamanya.</>}
                                     confirmText="Hapus Permanen"
-                                    onConfirm={() => router.delete(r('customers.force-delete', row.original.id))}
+                                    onConfirm={() => router.delete(r('warehouses.force-delete', row.original.id))}
                                 />
                             </>
                         ) : (
@@ -93,10 +103,10 @@ export default function Index({ customers, customerTypes, filters }: any) {
                                             <Trash size={16} />
                                         </Button>
                                     }
-                                    title="Hapus Customer?"
-                                    description={<>Yakin ingin menghapus customer <b>{row.original.name}</b>?</>}
+                                    title="Hapus Gudang?"
+                                    description={<>Yakin ingin menghapus gudang <b>{row.original.name}</b>?</>}
                                     confirmText="Hapus"
-                                    onConfirm={() => router.delete(r('customers.destroy', row.original.id))}
+                                    onConfirm={() => router.delete(r('warehouses.destroy', row.original.id))}
                                 />
                             </>
                         )}
@@ -109,15 +119,15 @@ export default function Index({ customers, customerTypes, filters }: any) {
 
     return (
         <div className="space-y-4">
-            <Head title="Data Customer" />
+            <Head title="Data Gudang" />
 
             <div className="flex justify-between items-center">
                 <div>
-                    <h1 className="text-xl font-bold text-foreground">Data Customer</h1>
-                    <p className="text-sm text-muted-foreground">Kelola informasi pelanggan toko Anda.</p>
+                    <h1 className="text-xl font-bold text-foreground">Data Gudang</h1>
+                    <p className="text-sm text-muted-foreground">Kelola daftar gudang penyimpanan stok barang.</p>
                 </div>
                 <Button size="lg" onClick={() => { setSelected(null); setOpen(true); }}>
-                    <Plus className="mr-1" size={16} /> Tambah Customer
+                    <Plus className="mr-1" size={16} /> Tambah Gudang
                 </Button>
             </div>
 
@@ -125,17 +135,17 @@ export default function Index({ customers, customerTypes, filters }: any) {
                 <CardContent className="px-4 py-4">
                     <DataTable
                         columns={columns}
-                        data={customers.data}
+                        data={warehouses.data}
                         paginationMeta={{
-                            current_page: customers.current_page,
-                            last_page: customers.last_page,
-                            per_page: customers.per_page,
-                            total: customers.total,
-                            from: customers.from,
-                            to: customers.to,
+                            current_page: warehouses.current_page,
+                            last_page: warehouses.last_page,
+                            per_page: warehouses.per_page,
+                            total: warehouses.total,
+                            from: warehouses.from,
+                            to: warehouses.to,
                         }}
                         filters={filters}
-                        routeName={r('customers.index')}
+                        routeName={r('warehouses.index')}
                         enableSearch={true}
                         enableSorting={true}
                         enablePagination={true}
@@ -160,16 +170,16 @@ export default function Index({ customers, customerTypes, filters }: any) {
             </Card>
 
             <Dialog open={open} onOpenChange={(val) => { setOpen(val); if (!val) setSelected(null); }}>
-                <DialogContent className="w-[90vw] md:w-[80vw] md:max-w-4xl max-h-[90vh] overflow-y-auto bg-card text-card-foreground border-border">
+                <DialogContent className="w-[90vw] md:w-[50vw] md:max-w-2xl max-h-[90vh] overflow-y-auto bg-card text-card-foreground border-border">
                     <DialogHeader>
                         <DialogTitle className="text-lg">
-                            {selected ? 'Edit Customer' : 'Tambah Customer Baru'}
+                            {selected ? 'Edit Gudang' : 'Tambah Gudang Baru'}
                         </DialogTitle>
                     </DialogHeader>
-                    <CustomerForm
+                    <WarehouseForm
                         key={selected?.id ?? 'create'}
-                        customer={selected}
-                        customerTypes={customerTypes}
+                        warehouse={selected}
+                        stores={stores}
                         onSuccess={() => setOpen(false)}
                         onCancel={() => setOpen(false)}
                     />
@@ -182,6 +192,6 @@ export default function Index({ customers, customerTypes, filters }: any) {
 Index.layout = {
     breadcrumbs: [
         { title: 'Dashboard', href: r('dashboard') },
-        { title: 'Customer', href: r('customers.index') },
+        { title: 'Gudang', href: r('warehouses.index') },
     ],
 };
