@@ -29,19 +29,15 @@ class Product extends Model
         'is_active',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'purchase_price' => 'decimal:2',
-            'selling_price' => 'decimal:2',
-            'minimum_stock' => 'decimal:3',
-            'maximum_stock' => 'decimal:3',
-
-            'has_batch' => 'boolean',
-            'has_expiry' => 'boolean',
-            'is_active' => 'boolean',
-        ];
-    }
+    protected $casts = [
+        'has_batch' => 'boolean',
+        'has_expiry' => 'boolean',
+        'is_active' => 'boolean',
+        'purchase_price' => 'decimal:2',
+        'selling_price' => 'decimal:2',
+        'minimum_stock' => 'decimal:3',
+        'maximum_stock' => 'decimal:3',
+    ];
 
     public function category()
     {
@@ -70,11 +66,19 @@ class Product extends Model
     {
         return $this->belongsToMany(
             Unit::class,
-            'product_units'
+            'product_units',
+            'product_id',
+            'unit_id'
         )
+        ->using(ProductUnit::class) 
         ->withPivot([
+            'id',
             'conversion_factor',
-            'is_base',
+            'purchase_price',
+            'selling_price',
+            'is_purchase_unit',
+            'is_sale_unit',
+            'is_default',
         ])
         ->withTimestamps();
     }
@@ -127,15 +131,6 @@ class Product extends Model
     public function discountProducts()
     {
         return $this->hasMany(DiscountProduct::class);
-    }
-
-    public function discounts()
-    {
-        return $this->belongsToMany(
-            Discount::class,
-            'discount_products'
-        )
-        ->withTimestamps();
     }
 
     public function promotionProducts()

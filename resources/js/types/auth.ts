@@ -7,6 +7,8 @@ export type User = {
     two_factor_enabled?: boolean;
     created_at: string;
     updated_at: string;
+    permissions?: string[]; 
+    roles?: string[];
     [key: string]: unknown;
 };
 
@@ -22,3 +24,10 @@ export type TwoFactorSetupData = {
 export type TwoFactorSecretKey = {
     secretKey: string;
 };
+
+declare module '@inertiajs/core' {
+    interface PageProps {
+        auth: Auth;
+        [key: string]: unknown;
+    }
+}

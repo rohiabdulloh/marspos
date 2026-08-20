@@ -14,24 +14,17 @@ class ProductPrice extends Model
         'unit_id',
         'price_type',
         'price',
-        'min_quantity',
-        'max_quantity',
-        'start_at',
-        'end_at',
+        'minimum_quantity',
+        'start_date',
+        'end_date',
         'is_active',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'price' => 'decimal:2',
-            'min_quantity' => 'decimal:3',
-            'max_quantity' => 'decimal:3',
-            'start_at' => 'datetime',
-            'end_at' => 'datetime',
-            'is_active' => 'boolean',
-        ];
-    }
+    protected $casts = [
+        'price' => 'decimal:2',
+        'minimum_quantity' => 'decimal:3',
+        'is_active' => 'boolean',
+    ];
 
     public function product()
     {

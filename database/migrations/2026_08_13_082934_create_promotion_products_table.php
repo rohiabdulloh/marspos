@@ -13,22 +13,23 @@ return new class extends Migration
     {
         Schema::create('promotion_products', function (Blueprint $table) {
             $table->id();
-
+        
             $table->foreignId('promotion_id')
                 ->constrained('promotions')
                 ->cascadeOnDelete();
-
+        
             $table->foreignId('product_id')
                 ->constrained('products')
                 ->cascadeOnDelete();
-
+        
             $table->timestamps();
-
+        
+            // Mencegah duplikasi produk pada promo yang sama
             $table->unique([
                 'promotion_id',
                 'product_id',
             ]);
-
+        
             $table->index('product_id');
         });
     }

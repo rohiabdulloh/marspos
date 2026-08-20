@@ -1,0 +1,51 @@
+// resources/js/lib/permissions.ts
+
+export const PERMISSION_TRANSLATIONS: Record<string, string> = {
+    'dashboard': 'Dashboard',
+    'pos': 'Point of Sale',
+    'sales': 'Penjualan',
+    'sales-returns': 'Retur Penjualan',
+    'purchases': 'Pembelian',
+    'purchase-returns': 'Retur Pembelian',
+    'payments': 'Pembayaran',
+    'products': 'Produk',
+    'categories': 'Kategori',
+    'brands': 'Merek',
+    'units': 'Satuan',
+    'customer-types': 'Tipe Pelanggan',
+    'customers': 'Pelanggan',
+    'suppliers': 'Pemasok',
+    'stores': 'Toko',
+    'warehouses': 'Gudang',
+    'promotions': 'Promosi',
+    'stocks': 'Stok',
+    'stock-cards': 'Kartu Stok',
+    'stock-opnames': 'Stok Opname',
+    'stock-transfers': 'Transfer Stok',
+    'batches': 'Batch Produk',
+    'stock-adjustments': 'Penyesuaian Stok',
+    'cash': 'Kas',
+    'receivables': 'Piutang',
+    'payables': 'Utang',
+    'cash-in': 'Kas Masuk',
+    'cash-out': 'Kas Keluar',
+    'sales-report': 'Laporan Penjualan',
+    'purchase-report': 'Laporan Pembelian',
+    'stock-report': 'Laporan Stok',
+    'best-selling': 'Produk Terlaris',
+    'profit-report': 'Laporan Laba',
+    'receivable-report': 'Laporan Piutang',
+    'payable-report': 'Laporan Utang',
+    'cash-report': 'Laporan Kas',
+    'users': 'Pengguna',
+    'roles': 'Role & Hak Akses',
+    'printer': 'Pengaturan Printer',
+    'payment-settings': 'Pengaturan Pembayaran',
+    'tax': 'Pajak',
+    'audit-log': 'Audit Log',
+};
+
+
+export function translate(permissionName: string): string {
+    return PERMISSION_TRANSLATIONS[permissionName] || permissionName;
+}

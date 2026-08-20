@@ -8,6 +8,7 @@ import {
     useReactTable,
     SortingState,
     ExpandedState,
+    getExpandedRowModel,
 } from '@tanstack/react-table';
 
 import {
@@ -19,8 +20,10 @@ import {
     TableRow,
 } from '@/components/ui/table';
 
-import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { ArrowUpDown, ArrowUp, ArrowDown, Trash2 } from 'lucide-react';
 import { router } from '@inertiajs/react';
+import { ConfirmDialog } from '@/components/confirm-dialog'; // Pastikan path import ini sesuai dengan project Anda
 
 import { DataTableToolbar } from './data-table-toolbar';
 import { DataTableBulkActions } from './data-table-bulk-actions';
@@ -30,7 +33,6 @@ type DataTableProps<TData, TValue> = {
     columns: ColumnDef<TData, TValue>[];
     data: TData[];
     
-    // Server-side metadata dari Paginator Laravel
     paginationMeta: {
         current_page: number;
         last_page: number;
@@ -45,7 +47,7 @@ type DataTableProps<TData, TValue> = {
         direction?: string;
         [key: string]: any;
     };
-    routeName: string; // Routeinertia tujuan untuk fetch data
+    routeName: string;
 
     isTree?: boolean;
     getSubRows?: (row: TData) => TData[] | undefined;
@@ -54,10 +56,12 @@ type DataTableProps<TData, TValue> = {
     enablePagination?: boolean;
     enableRowSelection?: boolean;
     bulkActions?: (rows: TData[]) => React.ReactNode;
+    bulkDeleteRoute?: string; // <-- Tambahan props untuk endpoint hapus massal
     getRowId?: (row: TData) => string;
     pageSizeOptions?: number[];
     emptyText?: string;
     statusFilter?: React.ReactNode;
+    renderSubComponent?: (props: { row: any }) => React.ReactNode;
 };
 
 export function DataTable<TData, TValue>({
@@ -72,10 +76,12 @@ export function DataTable<TData, TValue>({
     enablePagination = true,
     enableRowSelection = false,
     bulkActions,
+    bulkDeleteRoute, // <-- Tangkap props-nya di sini
     getRowId,
     pageSizeOptions = [10, 20, 50, 100],
     emptyText = 'No data found.',
     statusFilter,
+    renderSubComponent,
 }: DataTableProps<TData, TValue>) {
 
     const [sorting, setSorting] = React.useState<SortingState>(
@@ -154,12 +160,27 @@ export function DataTable<TData, TValue>({
         onGlobalFilterChange: setGlobalFilter,
         onExpandedChange: setExpanded,
         enableRowSelection,
-        getRowId,
+        getRowId: getRowId ?? ((row: any) => row.id),
         getSubRows,
         getCoreRowModel: getCoreRowModel(),
+        getExpandedRowModel: getExpandedRowModel(), 
+        getRowCanExpand: () => true,
     });
 
     const selectedRows = table.getSelectedRowModel().rows.map(r => r.original);
+
+    // Fungsi otomatis untuk menghapus data massal jika bulkDeleteRoute disediakan
+    const handleDefaultBulkDelete = () => {
+        if (!bulkDeleteRoute) return;
+        const ids = selectedRows.map((row: any) => row.id);
+
+        router.post(bulkDeleteRoute, { ids }, {
+            preserveScroll: true,
+            onSuccess: () => {
+                table.resetRowSelection(); // Bersihkan pilihan setelah sukses
+            },
+        });
+    };
 
     const handlePageChange = (newPage: number) => {
         router.get(routeName, { ...filters, page: newPage }, { preserveState: true, replace: true });
@@ -171,8 +192,30 @@ export function DataTable<TData, TValue>({
 
     return (
         <div className="space-y-4">
-            {enableRowSelection && bulkActions && (
-                <DataTableBulkActions selectedRows={selectedRows} bulkActions={bulkActions} />
+            {/* Tampilkan custom bulkActions jika ada, atau fallback otomatis ke tombol hapus bawaan jika bulkDeleteRoute diisi */}
+            {enableRowSelection && selectedRows.length > 0 && (
+                <>
+                    {bulkActions ? (
+                        <DataTableBulkActions selectedRows={selectedRows} bulkActions={bulkActions} />
+                    ) : bulkDeleteRoute ? (
+                        <div className="flex items-center justify-between p-3 border rounded-md bg-muted/50 dark:bg-muted/30 border-border">
+                            <span className="text-sm font-medium text-foreground">
+                                {selectedRows.length} data dipilih
+                            </span>
+                            <ConfirmDialog
+                                trigger={
+                                    <Button variant="destructive" size="sm">
+                                        <Trash2 size={15} className="mr-1.5" /> Hapus Terpilih
+                                    </Button>
+                                }
+                                title="Hapus Data Terpilih?"
+                                description={`Yakin ingin menghapus ${selectedRows.length} data yang dipilih secara massal?`}
+                                confirmText="Hapus"
+                                onConfirm={handleDefaultBulkDelete}
+                            />
+                        </div>
+                    ) : null}
+                </>
             )}
 
             <DataTableToolbar
@@ -217,13 +260,23 @@ export function DataTable<TData, TValue>({
                     <TableBody>
                         {table.getRowModel().rows.length ? (
                             table.getRowModel().rows.map((row) => (
-                                <TableRow key={row.id} className="border-[var(--border)] dark:hover:bg-muted/50">
-                                    {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id} className="dark:text-foreground">
-                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                        </TableCell>
-                                    ))}
-                                </TableRow>
+                                <React.Fragment key={row.id}>
+                                    <TableRow className="border-[var(--border)] dark:hover:bg-muted/50">
+                                        {row.getVisibleCells().map((cell) => (
+                                            <TableCell key={cell.id} className="dark:text-foreground">
+                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                            </TableCell>
+                                        ))}
+                                    </TableRow>
+                                    {/* Render Sub Component Tepat di Bawah Baris Persis */}
+                                    {row.getIsExpanded() && renderSubComponent && (
+                                        <TableRow className="bg-muted/30 hover:bg-muted/30">
+                                            <TableCell colSpan={row.getVisibleCells().length} className="p-4">
+                                                {renderSubComponent({ row })}
+                                            </TableCell>
+                                        </TableRow>
+                                    )}
+                                </React.Fragment>
                             ))
                         ) : (
                             <TableRow>

@@ -2,12 +2,10 @@ import { Form, Head } from '@inertiajs/react';
 import {
     Lock,
     Mail,
-    MonitorSmartphone,
 } from 'lucide-react';
 
 import AuthButton from '@/components/auth/auth-button';
 import AuthCheckbox from '@/components/auth/auth-checkbox';
-import AuthDivider from '@/components/auth/auth-divider';
 import AuthField from '@/components/auth/auth-field';
 
 import { register } from '@/routes';
@@ -107,20 +105,6 @@ export default function Login({
                                 {processing
                                     ? 'Memeriksa...'
                                     : 'Masuk'}
-                            </AuthButton>
-
-                            {/* Divider */}
-                            <AuthDivider />
-
-                            {/* Cashier PIN */}
-                            <AuthButton
-                                type="button"
-                                full
-                                variant="secondary"
-                                size="lg"
-                                icon={MonitorSmartphone}
-                            >
-                                Masuk sebagai Kasir (PIN)
                             </AuthButton>
 
                             {/* Register */}

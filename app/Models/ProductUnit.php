@@ -3,9 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
-class ProductUnit extends Model
+class ProductUnit extends Pivot
 {
     use HasFactory;
 
@@ -13,17 +13,21 @@ class ProductUnit extends Model
         'product_id',
         'unit_id',
         'conversion_factor',
-        'is_base',
-        'barcode',
+        'purchase_price',
+        'selling_price',
+        'is_purchase_unit',
+        'is_sale_unit',
+        'is_default',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'conversion_factor' => 'decimal:3',
-            'is_base' => 'boolean',
-        ];
-    }
+    protected $casts = [
+        'conversion_factor' => 'decimal:3',
+        'purchase_price' => 'decimal:2',
+        'selling_price' => 'decimal:2',
+        'is_purchase_unit' => 'boolean',
+        'is_sale_unit' => 'boolean',
+        'is_default' => 'boolean',
+    ];
 
     public function product()
     {
